@@ -321,7 +321,7 @@
         <div class="pips" id="pips" aria-hidden="true"></div>
       </div>
       <button class="reset" id="resetBtn">Nueva partida</button>
-      <button class="star" id="starBtn" title="Dale una estrella al repo en GitHub y gana un intento extra (una vez por partida)">&#9733; Estrella = +1 intento</button>
+      <button class="star" id="starBtn" title="Dale una estrella al repo en GitHub y gana un intento extra (una vez por partida)">&#9733; Estrella al repo = +1 intento</button>
     </div>
 
     <div class="search-wrap">
@@ -10243,7 +10243,7 @@ function renderStarBtn(){
   const b = document.getElementById("starBtn");
   b.classList.toggle("used", starBonus);
   b.disabled = starBonus;
-  b.innerHTML = starBonus ? "&#9733; +1 intento conseguido" : "&#9733; Estrella = +1 intento";
+  b.innerHTML = starBonus ? "&#9733; +1 intento conseguido" : "&#9733; Estrella al repo = +1 intento";
 }
 
 document.getElementById("starBtn").addEventListener("click", () => {
