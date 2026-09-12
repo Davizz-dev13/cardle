@@ -334,12 +334,12 @@
       <table>
         <thead>
           <tr>
-            <th>Marca</th><th>Modelo</th><th>Generación</th><th>Año</th>
+            <th>Marca</th><th>País</th><th>Modelo</th><th>Generación</th><th>Año</th>
             <th>Combustible</th><th>Cilindros</th><th>Cilindrada</th><th>Tracción</th>
           </tr>
         </thead>
         <tbody id="guessesBody">
-          <tr><td colspan="8"><div class="empty-state">Todavía no hay intentos. Busca un coche arriba para empezar.</div></td></tr>
+          <tr><td colspan="9"><div class="empty-state">Todavía no hay intentos. Busca un coche arriba para empezar.</div></td></tr>
         </tbody>
       </table>
     </div>
@@ -10005,6 +10005,29 @@ const CAR_GROUPS = {
   chery:      ["Jaecoo","Omoda"],
   kgm:        ["KGM","SsangYong"],
 };
+const COUNTRY_OF = {
+  "Abarth":"Italia","Alfa Romeo":"Italia","Alpine":"Francia","Ariel":"Reino Unido",
+  "Aston Martin":"Reino Unido","Audi":"Alemania","BMW":"Alemania","Bentley":"Reino Unido",
+  "Bugatti":"Francia","Cadillac":"EEUU","Caterham":"Reino Unido","Chevrolet":"EEUU",
+  "Chrysler":"EEUU","Citroën":"Francia","Cupra":"España","DS":"Francia",
+  "Dacia":"Rumanía","Daihatsu":"Japón","Daimler":"Reino Unido","De Tomaso":"Italia",
+  "Dodge":"EEUU","Donkervoort":"Países Bajos","Ferrari":"Italia","Fiat":"Italia",
+  "Ford":"EEUU","Genesis":"Corea","Great Wall":"China","Honda":"Japón",
+  "Hummer":"EEUU","Hyundai":"Corea","Ineos":"Reino Unido","Infiniti":"Japón",
+  "Isuzu":"Japón","Jaecoo":"China","Jaguar":"Reino Unido","Jeep":"EEUU",
+  "KGM":"Corea","Kia":"Corea","Koenigsegg":"Suecia","Lada":"Rusia",
+  "Lamborghini":"Italia","Lancia":"Italia","Land Rover":"Reino Unido","Lexus":"Japón",
+  "Lotus":"Reino Unido","Lynk & Co":"China","MG":"Reino Unido","Maserati":"Italia",
+  "Maybach":"Alemania","Mazda":"Japón","McLaren":"Reino Unido","Mercedes-Benz":"Alemania",
+  "Mini":"Reino Unido","Mitsubishi":"Japón","Morgan":"Reino Unido","Nissan":"Japón",
+  "Omoda":"China","Opel":"Alemania","Pagani":"Italia","Peugeot":"Francia",
+  "Piaggio":"Italia","Porsche":"Alemania","Proton":"Malasia","Renault":"Francia",
+  "Rolls-Royce":"Reino Unido","Rover":"Reino Unido","Saab":"Suecia","Seat":"España",
+  "Skoda":"Chequia","Smart":"Alemania","SsangYong":"Corea","Subaru":"Japón",
+  "Suzuki":"Japón","TVR":"Reino Unido","Tata":"India","Toyota":"Japón",
+  "Volkswagen":"Alemania","Volvo":"Suecia","Wiesmann":"Alemania","Yugo":"Serbia",
+};
+
 const GROUP_OF = {};
 for (const [g, brands] of Object.entries(CAR_GROUPS)) brands.forEach(b => { GROUP_OF[b] = g; });
 
@@ -10022,6 +10045,7 @@ function compareCars(guess, target){
 
   return {
     marca:      { status: sameMarca ? "correct" : (sameGroup ? "partial" : "wrong"), text: guess.marca },
+    pais:       { status: COUNTRY_OF[guess.marca] === COUNTRY_OF[target.marca] ? "correct" : "wrong", text: COUNTRY_OF[guess.marca] || "?" },
     modelo:     { status: sameModelo ? "correct" : "wrong", text: guess.modelo },
     generacion: { status: genStatus, text: guess.generacion, arrow: genArrow },
     anio:       { status: yearStatus, text: String(guess.inicio), arrow: yearArrow },
@@ -10043,13 +10067,14 @@ function cellHtml(field){
 function renderGuesses(){
   const body = document.getElementById("guessesBody");
   if (guesses.length === 0){
-    body.innerHTML = `<tr><td colspan="8"><div class="empty-state">Todavía no hay intentos. Busca un coche arriba para empezar.</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="9"><div class="empty-state">Todavía no hay intentos. Busca un coche arriba para empezar.</div></td></tr>`;
     return;
   }
   body.innerHTML = guesses.map((g, i) => {
     const r = compareCars(g, target);
     return `<tr${i === 0 && animateNewest ? ' class="row-new"' : ""}>
       <td>${cellHtml(r.marca)}</td>
+      <td>${cellHtml(r.pais)}</td>
       <td>${cellHtml(r.modelo)}</td>
       <td>${cellHtml(r.generacion)}</td>
       <td>${cellHtml(r.anio)}</td>
