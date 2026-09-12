@@ -9987,8 +9987,30 @@ function fmtCilindros(arr){
   return arr.join(" / ");
 }
 
+
+/* Grupos automovilisticos (propiedad mayoritaria, era 1990-hoy): misma celda
+   MARCA en amarillo si intento y objetivo son del mismo grupo. */
+const CAR_GROUPS = {
+  vag:        ["Audi","Bentley","Bugatti","Cupra","Lamborghini","Porsche","Seat","Skoda","Volkswagen"],
+  stellantis: ["Abarth","Alfa Romeo","Chrysler","Citroën","DS","Dodge","Fiat","Jeep","Lancia","Maserati","Opel","Peugeot"],
+  bmw:        ["BMW","Mini","Rolls-Royce"],
+  mercedes:   ["Maybach","Mercedes-Benz","Smart"],
+  renault:    ["Alpine","Dacia","Renault"],
+  toyota:     ["Daihatsu","Lexus","Toyota"],
+  hyundai:    ["Genesis","Hyundai","Kia"],
+  geely:      ["Lotus","Lynk & Co","Volvo"],
+  tata:       ["Jaguar","Land Rover","Tata"],
+  gm:         ["Cadillac","Chevrolet","Hummer"],
+  nissan:     ["Infiniti","Nissan"],
+  chery:      ["Jaecoo","Omoda"],
+  kgm:        ["KGM","SsangYong"],
+};
+const GROUP_OF = {};
+for (const [g, brands] of Object.entries(CAR_GROUPS)) brands.forEach(b => { GROUP_OF[b] = g; });
+
 function compareCars(guess, target){
   const sameMarca  = guess.marca === target.marca;
+  const sameGroup  = !sameMarca && GROUP_OF[guess.marca] && GROUP_OF[guess.marca] === GROUP_OF[target.marca];
   const sameModelo = sameMarca && guess.modelo === target.modelo;
   const sameGen    = guess.id === target.id;
 
@@ -9999,7 +10021,7 @@ function compareCars(guess, target){
   const yearArrow = yearStatus === "wrong" ? (guess.inicio < target.inicio ? "▲" : "▼") : "";
 
   return {
-    marca:      { status: sameMarca ? "correct" : "wrong", text: guess.marca },
+    marca:      { status: sameMarca ? "correct" : (sameGroup ? "partial" : "wrong"), text: guess.marca },
     modelo:     { status: sameModelo ? "correct" : "wrong", text: guess.modelo },
     generacion: { status: genStatus, text: guess.generacion, arrow: genArrow },
     anio:       { status: yearStatus, text: String(guess.inicio), arrow: yearArrow },
