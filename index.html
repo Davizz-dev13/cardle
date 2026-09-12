@@ -286,6 +286,19 @@
     outline-offset:2px;
   }
 
+  .th-abbr{display:none;}
+
+  @media (max-width:760px){
+    .table-wrap{overflow-x:visible;}
+    table{min-width:0; table-layout:fixed;}
+    thead th{font-size:8px; padding:6px 2px; letter-spacing:.02em; white-space:normal; overflow-wrap:break-word;}
+    .th-full{display:none;}
+    .th-abbr{display:inline;}
+    tbody td{padding:6px 2px; white-space:normal; font-size:10px; overflow-wrap:break-word;}
+    .cell{padding:3px 4px; font-size:9px; gap:2px; flex-wrap:wrap; line-height:1.2; border-radius:3px; overflow-wrap:anywhere;}
+    .arrow{font-size:8px;}
+  }
+
   @media (prefers-reduced-motion: reduce){
     tr.row-new td, tr.row-new .cell, .search-wrap.shake #search{animation:none !important;}
     .toast{transition:none;}
@@ -334,8 +347,7 @@
       <table>
         <thead>
           <tr>
-            <th>Marca</th><th>País</th><th>Modelo</th><th>Generación</th><th>Año</th>
-            <th>Combustible</th><th>Cilindros</th><th>Cilindrada</th><th>Tracción</th>
+            <th><span class="th-full">Marca</span><span class="th-abbr">Marca</span></th><th><span class="th-full">País</span><span class="th-abbr">País</span></th><th><span class="th-full">Modelo</span><span class="th-abbr">Mod.</span></th><th><span class="th-full">Generación</span><span class="th-abbr">Gen.</span></th><th><span class="th-full">Año</span><span class="th-abbr">Año</span></th><th><span class="th-full">Combustible</span><span class="th-abbr">Comb.</span></th><th><span class="th-full">Cilindros</span><span class="th-abbr">Cil.</span></th><th><span class="th-full">Cilindrada</span><span class="th-abbr">CC</span></th><th><span class="th-full">Tracción</span><span class="th-abbr">Trac.</span></th>
           </tr>
         </thead>
         <tbody id="guessesBody">
