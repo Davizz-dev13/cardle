@@ -217,6 +217,21 @@
   }
   button.reset:hover{border-color:var(--amber); color:var(--amber);}
 
+  button.star{
+    background:none;
+    border:1px solid var(--amber-dim);
+    color:var(--amber);
+    padding:9px 16px;
+    border-radius:6px;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+    white-space:nowrap;
+  }
+  button.star:hover{border-color:var(--amber); color:#ffd98a;}
+  button.star.used{opacity:.55; cursor:default; border-color:var(--border); color:var(--text-muted);}
+
   /* ---------- Mejoras UX ---------- */
   .counter-wrap{display:flex; flex-direction:column; gap:5px;}
   .pips{display:flex; gap:3px; flex-wrap:wrap; max-width:200px;}
@@ -306,6 +321,7 @@
         <div class="pips" id="pips" aria-hidden="true"></div>
       </div>
       <button class="reset" id="resetBtn">Nueva partida</button>
+      <button class="star" id="starBtn" title="Dale una estrella al repo en GitHub y gana un intento extra (una vez por partida)">&#9733; Estrella = +1 intento</button>
     </div>
 
     <div class="search-wrap">
@@ -9899,6 +9915,8 @@ let mode = "normal";
 let target = null;
 let guesses = [];
 let won = false; // partida terminada (victoria o sin intentos)
+let starBonus = false; // +1 intento canjeado por estrella (una vez por partida)
+function maxAttempts(){ return MODES[mode] + (starBonus ? 1 : 0); }
 let animateNewest = false;
 
 function carKey(c){ return c.marca + "||" + c.modelo + "||" + c.generacion; }
@@ -9913,7 +9931,8 @@ function saveGame(){
       mode: mode,
       target: target ? carKey(target) : null,
       guesses: guesses.map(carKey),
-      won: won
+      won: won,
+      starBonus: starBonus
     }));
   }catch(e){}
 }
@@ -9927,6 +9946,7 @@ function loadGame(){
     target = t;
     guesses = (Array.isArray(s.guesses) ? s.guesses : []).map(findCar).filter(Boolean);
     won = !!s.won;
+    starBonus = !!s.starBonus;
     return true;
   }catch(e){ return false; }
 }
@@ -9935,6 +9955,8 @@ function newGame(){
   target = CARS[Math.floor(Math.random() * CARS.length)];
   guesses = [];
   won = false;
+  starBonus = false;
+  renderStarBtn();
   animateNewest = false;
   document.getElementById("winBanner").classList.remove("show", "lose");
   document.getElementById("search").disabled = false;
@@ -10020,7 +10042,7 @@ function renderGuesses(){
 
 function updateCounter(){
   const n = guesses.length;
-  const max = MODES[mode];
+  const max = maxAttempts();
   document.getElementById("counter").textContent = `${n}/${max} intento${n === 1 ? "" : "s"}`;
   document.getElementById("pips").innerHTML =
     Array.from({length: max}, (_, i) => `<span class="pip${i < n ? " used" : ""}"></span>`).join("");
@@ -10063,7 +10085,7 @@ function submitGuess(car){
   updateCounter();
   if (car.id === target.id){
     endGame(true);
-  } else if (guesses.length >= MODES[mode]){
+  } else if (guesses.length >= maxAttempts()){
     endGame(false);
   }
   saveGame();
@@ -10170,6 +10192,31 @@ document.querySelector(".search-wrap").addEventListener("animationend", (e) => {
   e.currentTarget.classList.remove("shake");
 });
 
+function renderStarBtn(){
+  const b = document.getElementById("starBtn");
+  b.classList.toggle("used", starBonus);
+  b.disabled = starBonus;
+  b.innerHTML = starBonus ? "&#9733; +1 intento conseguido" : "&#9733; Estrella = +1 intento";
+}
+
+document.getElementById("starBtn").addEventListener("click", () => {
+  window.open("https://github.com/Davizz-dev13/cardle", "_blank", "noopener");
+  if (starBonus) return;
+  starBonus = true;
+  const lostOnEmpty = won && !guesses.some(g => g.id === target.id);
+  if (lostOnEmpty){
+    // el intento extra reabre una partida perdida por falta de intentos
+    won = false;
+    document.getElementById("winBanner").classList.remove("show", "lose");
+    document.getElementById("search").disabled = false;
+    searchInput.focus();
+  }
+  updateCounter();
+  renderStarBtn();
+  saveGame();
+  showToast("+1 intento: ¡gracias por la estrella!");
+});
+
 document.getElementById("resetBtn").addEventListener("click", () => {
   newGame();
   searchInput.focus();
@@ -10186,6 +10233,7 @@ if (loadGame()){
   });
   renderGuesses();
   updateCounter();
+  renderStarBtn();
   if (won){
     endGame(guesses.some(g => g.id === target.id));
   }
