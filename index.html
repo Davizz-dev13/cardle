@@ -10139,6 +10139,10 @@ function renderGroupsPanel(){
 }
 
 document.getElementById("groupsBtn").addEventListener("click", () => {
+  if (!starBonus){
+    showToast("Dale una estrella al repo (botón ★ de arriba) para desbloquear los grupos");
+    return;
+  }
   const panel = document.getElementById("groupsPanel");
   const open = panel.hasAttribute("hidden");
   panel.toggleAttribute("hidden", !open);
