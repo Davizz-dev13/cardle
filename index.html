@@ -232,6 +232,70 @@
   button.star:hover{border-color:var(--amber); color:#ffd98a;}
   button.star.used{opacity:.55; cursor:default; border-color:var(--border); color:var(--text-muted);}
 
+
+  /* ---------- Panel de grupos ---------- */
+  button.groups{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    padding:9px 16px;
+    border-radius:6px;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  button.groups:hover{border-color:var(--amber); color:var(--amber);}
+  button.groups[aria-expanded="true"]{border-color:var(--amber-dim); color:var(--amber); background:var(--panel-2);}
+  button.groups:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+
+  .groups-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px 18px 14px;
+    margin-bottom:16px;
+  }
+  .groups-panel[hidden]{display:none;}
+  .groups-hint{
+    color:var(--text-muted);
+    font-size:12.5px;
+    line-height:1.5;
+    margin-bottom:14px;
+  }
+  .groups-hint b{color:#f2cf8e; font-weight:600;}
+  .groups-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+  }
+  .group-card{
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:10px 12px;
+  }
+  .group-name{
+    font-family:'Oswald',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:5px;
+  }
+  .group-brands{
+    font-size:12.5px;
+    color:var(--text-muted);
+    line-height:1.55;
+  }
+  @media (max-width:760px){
+    .groups-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:430px){
+    .groups-grid{grid-template-columns:1fr;}
+  }
+
   /* ---------- Mejoras UX ---------- */
   .counter-wrap{display:flex; flex-direction:column; gap:5px;}
   .pips{display:flex; gap:3px; flex-wrap:wrap; max-width:200px;}
@@ -338,6 +402,12 @@
       </div>
       <button class="reset" id="resetBtn">Nueva partida</button>
       <button class="star" id="starBtn" title="Dale una estrella al repo en GitHub y gana un intento extra (una vez por partida)">&#9733; Estrella al repo = +1 intento</button>
+      <button class="groups" id="groupsBtn" aria-expanded="false" aria-controls="groupsPanel">Grupos</button>
+    </div>
+
+    <div class="groups-panel" id="groupsPanel" hidden>
+      <div class="groups-hint">Cuando la <b>MARCA</b> de un intento sale en <b>amarillo</b>, pertenece al mismo grupo que el coche objetivo. Estos son los grupos y sus marcas:</div>
+      <div class="groups-grid" id="groupsGrid"></div>
     </div>
 
     <div class="search-wrap">
@@ -10045,6 +10115,36 @@ const COUNTRY_OF = {
 
 const GROUP_OF = {};
 for (const [g, brands] of Object.entries(CAR_GROUPS)) brands.forEach(b => { GROUP_OF[b] = g; });
+
+const GROUP_LABELS = {
+  vag: "Grupo Volkswagen",
+  stellantis: "Stellantis",
+  bmw: "Grupo BMW",
+  mercedes: "Mercedes-Benz",
+  renault: "Grupo Renault",
+  toyota: "Toyota",
+  hyundai: "Hyundai Motor",
+  geely: "Geely",
+  tata: "Tata Motors",
+  gm: "General Motors",
+  nissan: "Nissan",
+  chery: "Chery",
+  kgm: "KG Mobility",
+};
+
+function renderGroupsPanel(){
+  document.getElementById("groupsGrid").innerHTML = Object.entries(CAR_GROUPS).map(([g, brands]) =>
+    `<div class="group-card"><div class="group-name">${GROUP_LABELS[g] || g}</div><div class="group-brands">${brands.join(" · ")}</div></div>`
+  ).join("");
+}
+
+document.getElementById("groupsBtn").addEventListener("click", () => {
+  const panel = document.getElementById("groupsPanel");
+  const open = panel.hasAttribute("hidden");
+  panel.toggleAttribute("hidden", !open);
+  document.getElementById("groupsBtn").setAttribute("aria-expanded", open ? "true" : "false");
+});
+renderGroupsPanel();
 
 function compareCars(guess, target){
   const sameMarca  = guess.marca === target.marca;
